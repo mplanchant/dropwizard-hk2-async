@@ -1,10 +1,10 @@
-# dropwizard-async
+# dropwizard-hk-async
 
-How to start the dropwizard-async application
+How to start the dropwizard-hk-async application
 ---
 
 1. Run `mvn clean install` to build your application
-1. Start application with `java -jar target/dropwizard-async-1.0-SNAPSHOT.jar server config.yml`
+1. Start application with `java -jar target/dropwizard-hk-async-1.0-SNAPSHOT.jar server config.yml`
 1. To check that your application is running enter url `http://localhost:8080`
 
 Health Check
