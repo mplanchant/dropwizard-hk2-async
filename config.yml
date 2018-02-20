@@ -4,3 +4,7 @@ logging:
     com.logiccache: DEBUG
 swagger:
   resourcePackage: com.logiccache.resources
+cassandra:
+  clusterName: "minimal-cluster"
+  contactPoints: ["localhost"]
+  keyspace: "library"

@@ -1,12 +1,18 @@
 package com.logiccache.api;
 
-import lombok.Builder;
+import com.datastax.driver.mapping.annotations.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Data
-@Builder
+@Table(name = "books")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Book {
-    private String id;
+    private UUID id;
     private String title;
-    private Author author;
+    private String author;
 }

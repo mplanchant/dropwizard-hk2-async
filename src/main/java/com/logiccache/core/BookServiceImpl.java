@@ -1,42 +1,36 @@
 package com.logiccache.core;
 
-import com.logiccache.api.Author;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.mapping.Mapper;
+import com.datastax.driver.mapping.MappingManager;
 import com.logiccache.api.Book;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class BookServiceImpl implements BookService {
 
+    private Session session;
+    private Mapper<Book> mapper;
+
+    @Inject
+    public BookServiceImpl(Session session) {
+        this.session = session;
+        this.mapper = new MappingManager(session).mapper(Book.class);
+    }
+
     @Override
     public Book retrieveBook(String id) {
-        return Book.builder()
-                .id("1")
-                .title("Animal Farm")
-                .author(Author.builder().id("1").name("George Orwell").build())
-                .build();
+        return new Book(UUID.randomUUID(), "Animal Farm", "George Orwell");
     }
 
     @Override
     public List<Book> retrieveAllBooks() {
-        return Arrays.asList(
-                Book.builder()
-                        .id("1")
-                        .title("Animal Farm")
-                        .author(Author.builder().id("1").name("George Orwell").build())
-                        .build(),
-                Book.builder()
-                        .id("2")
-                        .title("For Whom the Bell Tolls")
-                        .author(Author.builder().id("1").name("Ernest Hemingway").build())
-                        .build(),
-                Book.builder()
-                        .id("3")
-                        .title("The Ragged-Trousered Philanthropists")
-                        .author(Author.builder().id("1").name("Robert Tressell").build())
-                        .build()
-        );
+        final ResultSet resultSet = session.execute("SELECT * FROM books");
+        return mapper.map(resultSet).all();
     }
 }

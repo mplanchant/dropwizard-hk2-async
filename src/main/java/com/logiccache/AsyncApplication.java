@@ -1,15 +1,19 @@
 package com.logiccache;
 
-import com.logiccache.component.BookComponent;
-import com.logiccache.component.DaggerBookComponent;
+import com.logiccache.core.BookService;
+import com.logiccache.core.BookServiceImpl;
 import com.logiccache.health.BookHealthCheck;
-import com.logiccache.module.BookModule;
-import com.logiccache.module.ExecutorModule;
+import com.logiccache.resources.BookResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import systems.composable.dropwizard.cassandra.CassandraBundle;
+import systems.composable.dropwizard.cassandra.CassandraFactory;
+
+import java.util.concurrent.ExecutorService;
 
 public class AsyncApplication extends Application<AsyncConfiguration> {
 
@@ -19,7 +23,7 @@ public class AsyncApplication extends Application<AsyncConfiguration> {
 
     @Override
     public String getName() {
-        return "dropwizard-async";
+        return "dropwizard-hk2-async";
     }
 
     @Override
@@ -30,17 +34,24 @@ public class AsyncApplication extends Application<AsyncConfiguration> {
                 return configuration.swaggerBundleConfiguration;
             }
         });
+        bootstrap.addBundle(new CassandraBundle<AsyncConfiguration>() {
+            @Override
+            public CassandraFactory getCassandraFactory(AsyncConfiguration configuration) {
+                return configuration.getCassandraConfig();
+            }
+        });
     }
 
     @Override
     public void run(final AsyncConfiguration configuration, final Environment environment) {
         environment.healthChecks().register("book", new BookHealthCheck());
-
-        final BookComponent component = DaggerBookComponent.builder()
-                .bookModule(new BookModule())
-                .executorModule(new ExecutorModule(environment.lifecycle().executorService("executor").build()))
-                .build();
-
-        environment.jersey().register(component.inject());
+        environment.jersey().register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(BookServiceImpl.class).to(BookService.class);
+                bind(environment.lifecycle().executorService("executor").build()).to(ExecutorService.class);
+            }
+        });
+        environment.jersey().register(BookResource.class);
     }
 }
