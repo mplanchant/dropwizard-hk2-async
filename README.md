@@ -11,3 +11,33 @@ Health Check
 ---
 
 To see your applications health enter url `http://localhost:8081/healthcheck`
+
+
+Data
+---
+
+Create keyspace:
+
+```sql
+CREATE KEYSPACE library WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
+```
+
+Create table:
+
+```sql
+CREATE TABLE library.books (
+    title text,
+    id uuid,
+    author text,
+    PRIMARY KEY (title, id)
+) WITH CLUSTERING ORDER BY (id DESC);
+```
+
+Insert some data:
+
+```sql
+insert into books (title, id, author) values ('Animal Farm', uuid(), 'George Orwell');
+insert into books (title, id, author) values ('The Ragged-Trousered Philanthropists', uuid(), 'Robert Tressell');
+insert into books (title, id, author) values ('For Whom the Bell Tolls', uuid(), 'Ernest Hemmingway');
+insert into books (title, id, author) values ('Oliver Twist', uuid(), 'Charles Dickens');
+```
