@@ -2,6 +2,8 @@ package com.logiccache;
 
 import com.logiccache.core.BookService;
 import com.logiccache.core.BookServiceImpl;
+import com.logiccache.factory.MappingManagerFactory;
+import com.logiccache.factory.MappingManagerFactoryImpl;
 import com.logiccache.health.BookHealthCheck;
 import com.logiccache.resources.BookResource;
 import io.dropwizard.Application;
@@ -50,6 +52,7 @@ public class AsyncApplication extends Application<AsyncConfiguration> {
             protected void configure() {
                 bind(BookServiceImpl.class).to(BookService.class);
                 bind(environment.lifecycle().executorService("executor").build()).to(ExecutorService.class);
+                bind(MappingManagerFactoryImpl.class).to(MappingManagerFactory.class);
             }
         });
         environment.jersey().register(BookResource.class);
